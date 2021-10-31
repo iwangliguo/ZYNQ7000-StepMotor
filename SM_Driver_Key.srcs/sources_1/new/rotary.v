@@ -23,7 +23,8 @@ module     rotary     (
 //                       input a_in,
 //                       input b_in,
 //                       input z_in,
-                       input        [1:0]  key ,
+                       input        [1:0]  key_led ,
+                       input        [2:0]  key_sm,
                       // output dir,
                       // output zero,
                        //seg
@@ -51,6 +52,10 @@ module     rotary     (
                        );    
 wire clk;
 wire rst_n;
+
+wire [3:0] spd_index;
+wire [3:0] spd_dir;
+
 wire [15:0] dis_data;
 wire pulse;
 wire dir;
@@ -66,16 +71,20 @@ encoder   u1        (
 //                     .a_in(a_in),
 //                     .b_in(b_in),
 //                     .z_in(z_in),
+                     .key(key_sm),
+                     //output
+                     .spd_index(spd_index),
                      .dir(dir),
                     // .zero(zero),
                      .pulse(pulse),
                      .bcd_data(dis_data)
                      );  
-                     
+ 
+assign spd_dir = {3'b000,motor_dir};                    
 seg_dis    u2       (
                      .clk(clk),      
                      .rst_n(rst_n),      
-                     .dis_data({16'h8000,dis_data}),   
+                     .dis_data({8'h80,spd_index,spd_dir,dis_data}),   
                      //output   
                      .seg_a(seg_a),     
                      .seg_b(seg_b),     
@@ -111,7 +120,7 @@ key_led        u4       (
                          .sys_clk(clk) ,
                          .sys_rst_n(rst_n) ,
                       
-                         .key(key), 
+                         .key(key_led), 
                          .led(led)
                       );                                             
               
